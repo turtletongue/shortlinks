@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./
+    container_name: shorlinks-api
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "3030:3030"
+    volumes:
+      - .:/app
+
+  db:
+    image: postgres:13-alpine3.15
+    container_name: shortlinks-db
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=4fdfGw310
+      - POSTGRES_DB=shortlinks
+    volumes:
+      - data:/var/lib/postgresql/data
+
+volumes:
+  data:
+    name: shorlinks_data
