@@ -22,8 +22,6 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
-    env_file:
-      - .database.env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

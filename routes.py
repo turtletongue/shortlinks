@@ -87,7 +87,7 @@ def initialize_routes(app, login_manager):
                     return redirect(url_for('index'))
 
                 link.kind = form.type.data
-                link.alias = form.alias.data
+                link.alias = form.alias.data if form.alias.data else None
 
                 session.commit()
 
