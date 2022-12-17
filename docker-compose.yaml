@@ -3,7 +3,7 @@ version: "3.9"
 services:
   api:
     build: ./
-    container_name: shorlinks-api
+    container_name: shortlinks-api
     restart: unless-stopped
     tty: true
     stdin_open: true
@@ -22,13 +22,15 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
+    env_file:
+      - .database.env
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=4fdfGw310
-      - POSTGRES_DB=shortlinks
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - data:/var/lib/postgresql/data
 
 volumes:
   data:
-    name: shorlinks_data
+    name: shortlinks_data

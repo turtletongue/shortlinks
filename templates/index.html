@@ -1,27 +1,57 @@
 {% extends 'base.html' %} {% block title %} Создать ссылку {% endblock %} {%
 block content %}
 
-<main class="w-100 p-2">
-  <div class="w-100 d-flex justify-content-center">
-    <div class="m-0">
-      <h1 class="title text-center">Создать ссылку</h1>
-      <form action="/" method="POST">
-        <div>
-          {{ form.link.label(class="form-label") }}: {{
-          form.link(class="form-control") }}
-        </div>
-        <div class="mt-1">
-          {{ form.type.label(class="form-label") }}: {{
-          form.type(class="form-control") }}
-        </div>
-        <div class="mt-1">
-          {{ form.alias.label(class="form-label") }}: {{
-          form.alias(class="form-control") }}
-        </div>
-        {{ form.submit(class="btn btn-primary w-100 mt-2") }} {{ form.csrf_token
-        }}
-      </form>
-    </div>
+<main class="w-75 p-2 m-auto">
+  <div class="my-5">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Тип</th>
+          <th scope="col">Оригинал</th>
+          <th scope="col">Сокращённая</th>
+          <th scope="col">Псевдоним</th>
+          <th scope="col">Количество переходов</th>
+          <th scope="col">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for link in links %}
+        <tr>
+          <th scope="row">{{ link['id'] }}</th>
+          <td>{{ link['type'] }}</td>
+          <td>
+            <a href="{{ link['original'] }}">{{ link['original'] }}</a>
+          </td>
+          <td>
+            <a href="{{ link['short'] }}">{{ link['short'] }}</a>
+          </td>
+          <td>
+            <a href="{{ link['alias'] }}">{{ link['alias'] }}</a>
+          </td>
+          <td>{{ link['redirects_count'] }}</td>
+          <td>
+            <a href="/edit/{{ link['id'] }}">Настроить</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="my-5 w-25">
+    <h1 class="title text-center">Создание ссылки</h1>
+    <form action="/" method="POST">
+      <div>
+        {{ form.link.label(class="form-label") }}: {{ form.link(class="form-control") }}
+      </div>
+      <div class="mt-1">
+        {{ form.type.label(class="form-label") }}: {{ form.type(class="form-control") }}
+      </div>
+      <div class="mt-1">
+        {{ form.alias.label(class="form-label") }}: {{ form.alias(class="form-control") }}
+      </div>
+      {{ form.submit(class="btn btn-primary w-100 mt-2") }} {{ form.csrf_token }}
+    </form>
   </div>
 </main>
 {% endblock %}
