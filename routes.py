@@ -1,66 +1,74 @@
-from flask import request, url_for, redirect, render_template, abort, flash
-from flask_login import login_user
+from flask import url_for, redirect, render_template, flash
+from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from models import User
-from dto import UserDto
-from errors import format_error
 from db import engine
-from forms import LoginForm
+from forms import LoginForm, RegistrationForm, CreateLinkForm
 
 def initialize_routes(app, login_manager):
   with Session(engine) as session:
     @login_manager.user_loader
     def load_user(user_id):
-      return User.get(user_id)
+      return session.scalars(select(User).where(User.id == user_id)).first()
+
+    @app.route('/', methods=['GET', 'POST'])
+    @login_required
+    def index():
+      form = CreateLinkForm()
+
+      return render_template('index.html', form=form)
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
       form = LoginForm()
 
-      if form.validate_on_submit():
-        user = User.query.filter(username=form.username.data).fetchone()
+      if current_user.is_authenticated:
+        return redirect(url_for('index'))
 
-        if not user.verify_password(form.password.data):
-          return abort(400)
-          
+      if form.validate_on_submit():
+        user = session.scalars(select(User).where(User.username == form.username.data)).first()
+
+        if user is None or not user.verify_password(form.password.data):
+          flash("Неправильный логин или пароль")
+
+          return render_template('login.html', form=form)
+
         login_user(user)
-        flash("Logged in successfully")
 
         return redirect(url_for('index'))
 
       return render_template('login.html', form=form)
 
-    @app.route('/signup', methods=['POST'])
+    @app.route('/signup', methods=['GET', 'POST'])
     def signup():
-      return "SignUp"
+      form = RegistrationForm()
 
-    @app.route('/logout', methods=['POST'])
+      if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+      if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+          flash('Пароли должны совпадать')
+
+          return render_template('signup.html', form=form)
+
+        user = User(username=form.username.data, password=form.password.data)
+        user.hash_password()
+
+        session.add(user)
+        session.commit()
+
+        flash('Вы успешно зарегистрировались')
+
+        return redirect(url_for('login'))
+
+      return render_template('signup.html', form=form)
+
+    @app.route('/logout', methods=['GET'])
+    @login_required
     def logout():
-      return "Logout"
+      logout_user()
 
-    @app.route('/users', methods=['POST'])
-    def create_user():
-      try:
-        user_dto = UserDto(request.json)
-      except ValueError as error:
-        return format_error(400, str(error))
-
-      user = User(username=user_dto.username, password=user_dto.password)
-      user.hash_password()
-
-      session.add(user)
-      session.commit()
-
-      return user.to_dict(), 201
-
-    @app.route('/users/<id>', methods=['GET'])
-    def get_user_by_id(id):
-      user = session.scalars(select(User).where(User.id == id)).first()
-
-      if user == None:
-        return format_error(404, "User not found")
-
-      return user.to_dict()
-      
+      return redirect(url_for('login'))

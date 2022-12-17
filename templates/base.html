@@ -14,23 +14,34 @@
     />
   </head>
   <body>
-    <nav>
-      <h1>Shortlinks</h1>
-      <ul>
-        {% if g.user %}
-        <li><span>{{ g.user['username'] }}</span></li>
-         {% else %}</li>
-
-        <li>
-          <a href="{{ url_for('login') }}">Войти</a>
-          
-        </li>
-        {% endif %}
-      </ul>
+    <nav class="navbar navbar-expand-lg bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Shortlinks</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNav">
+          <ul class="navbar-nav">
+            {% if current_user.is_authenticated %}
+            <li class="nav-link"><span>{{ current_user.username }}</span></li>
+            <li>
+              <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
+            </li>
+            {% else %}</li>
+            <li>
+              <a class="nav-link" href="{{ url_for('login') }}">Войти</a>
+            </li>
+            <li>
+              <a class="nav-link" href="{{ url_for('signup') }}">Зарегистрироваться</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
     </nav>
     <section class="content">
       {% for message in get_flashed_messages() %}
-      <div class="flash">{{ message }}</div>
+      <div class="flash my-2 w-full text-center">{{ message }}</div>
       {% endfor %} {% block content %}{% endblock %}
     </section>
     <script

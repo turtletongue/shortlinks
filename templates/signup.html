@@ -1,11 +1,11 @@
-{% extends 'base.html' %} {% block title %} Войти {% endblock %} {% block
+{% extends 'base.html' %} {% block title %} Регистрация {% endblock %} {% block
 content %}
 
 <main class="w-100 p-2">
   <div class="w-100 d-flex justify-content-center">
     <div class="m-0">
-      <h1 class="title text-center">Авторизация</h1>
-      <form action="/login" method="POST">
+      <h1 class="title text-center">Регистрация</h1>
+      <form action="/signup" method="POST">
         <div>
           {{ form.username.label(class="form-label") }}: {{
           form.username(class="form-control") }}
@@ -13,6 +13,10 @@ content %}
         <div class="mt-1">
           {{ form.password.label(class="form-label") }}: {{
           form.password(class="form-control") }}
+        </div>
+        <div class="mt-1">
+          {{ form.password_again.label(class="form-label") }}: {{
+          form.password_again(class="form-control") }}
         </div>
         {% if form.password.errors %}
         <ul class="errors">
